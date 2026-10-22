@@ -249,6 +249,10 @@ button:disabled { cursor: not-allowed; opacity: 0.48; }
 .instruction-list { display: grid; gap: 0; margin: 24px 0 0; padding: 0; list-style: none; }
 .instruction-list li { display: grid; min-height: 48px; grid-template-columns: 40px 1fr; align-items: center; border-top: 1px solid rgba(207, 191, 153, 0.12); color: #ddd9cf; font-size: 12px; line-height: 1.55; }
 .instruction-number { color: var(--color-gold); font-family: var(--font-serif); font-size: 14px; }
+.instruction-copy { display: grid; gap: 3px; }
+.instruction-section { color: var(--color-gold-light); font-family: var(--font-serif); font-size: 14px; letter-spacing: 0.005em; }
+.instruction-text { color: #ddd9cf; font-size: 12px; line-height: 1.55; }
+.modal-hint { margin: 18px 0 0; padding: 11px 13px; border: 1px solid rgba(207, 191, 153, 0.16); background: rgba(12, 16, 16, 0.44); color: #a5aaa2; font-size: 11px; line-height: 1.7; }
 .modal-note { margin: 20px 0 0; color: #7f8781; font-size: 10px; letter-spacing: 0.025em; }
 
 @keyframes reveal-page { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }

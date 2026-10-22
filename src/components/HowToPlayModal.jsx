@@ -1,11 +1,33 @@
 import { useEffect, useRef } from 'react'
 
+// Each step names a section that is really on the Investigation page so a
+// first-time player can find the tool that does the job.
 const investigationSteps = [
-  'Explore the crime scene.',
-  'Collect and inspect clues.',
-  'Connect suspects, objects, and locations.',
-  'Reconstruct the timeline.',
-  'Submit a final accusation supported by evidence.',
+  {
+    id: 'explore',
+    section: 'Crime Scene Map',
+    text: 'Travel between mansion rooms. Every clue is filed in one of them.',
+  },
+  {
+    id: 'search',
+    section: 'Intelligent Clue Search',
+    text: 'Find clues fast by typing the start of any word. The search runs on a Trie prefix index.',
+  },
+  {
+    id: 'people',
+    section: 'Suspects',
+    text: 'Open each suspect card for their account and motive, then compare follow-up priorities in Suspect Analysis.',
+  },
+  {
+    id: 'timeline',
+    section: 'Deduction Lab',
+    text: 'Walk the reported Timeline, then test one theory at a time in the Deduction Lab.',
+  },
+  {
+    id: 'accuse',
+    section: 'Make Final Accusation',
+    text: 'Name one suspect, cite the clues that matter, and explain your reasoning.',
+  },
 ]
 
 function HowToPlayModal({ isOpen, onClose }) {
@@ -85,14 +107,22 @@ function HowToPlayModal({ isOpen, onClose }) {
         </p>
         <ol className="instruction-list">
           {investigationSteps.map((step, index) => (
-            <li key={step}>
+            <li key={step.id}>
               <span aria-hidden="true" className="instruction-number">
                 0{index + 1}
               </span>
-              <span>{step}</span>
+              <span className="instruction-copy">
+                <span className="instruction-section">{step.section}</span>
+                <span className="instruction-text">{step.text}</span>
+              </span>
             </li>
           ))}
         </ol>
+        <p className="modal-hint">
+          Clues stay sealed until you uncover them, and every clue is filed in a
+          room on the Crime Scene Map. Exploring the map is how you learn which
+          room holds a clue.
+        </p>
         <p className="modal-note">The current case is fully playable and can be replayed. Algorithmic scores and deductions support investigation; they do not prove guilt.</p>
       </section>
     </div>
