@@ -41,6 +41,8 @@ export function createInitialGameProgress(caseFile = case001) {
     journalEntries: [],
     bookmarks: emptyBookmarks(),
     completion: null,
+    // A fresh case shows the guided tour once; older saves never see it again.
+    tourCompleted: false,
     savedAt: null,
   }
 }
@@ -83,7 +85,8 @@ function migrateVersionZero(data, now) {
 
 function migrateVersionOne(data) {
   // Version 2 adds one validated, player-authored final accusation attempt.
-  return { ...data, schemaVersion: SAVE_SCHEMA_VERSION, completion: null }
+  // Saves that predate the guided tour are treated as already toured.
+  return { ...data, schemaVersion: SAVE_SCHEMA_VERSION, completion: null, tourCompleted: true }
 }
 
 function normalizeCompletion(completion, { caseFile, discoveredEvidenceIds }, errors, warnings) {
@@ -258,6 +261,13 @@ export function validateGameProgress(data, { caseFile = case001, now = new Date(
     discoveredEvidenceIds: discoveredSet,
   }, errors, warnings)
 
+  // Saves written before the guided tour existed carry no flag; those players
+  // are never pushed back through the tour.
+  const tourCompleted = source.tourCompleted === undefined
+    ? true
+    : typeof source.tourCompleted === 'boolean' ? source.tourCompleted : null
+  if (tourCompleted === null) errors.push('The saved guided-tour state must be true or false.')
+
   if (!isTimestamp(source.savedAt)) errors.push('The save timestamp is missing or invalid.')
 
   if (errors.length) return { valid: false, errors, warnings, progress: null }
@@ -268,6 +278,7 @@ export function validateGameProgress(data, { caseFile = case001, now = new Date(
     journalEntries,
     bookmarks,
     completion,
+    tourCompleted,
     savedAt: source.savedAt,
   }
   return { valid: true, errors, warnings, progress }

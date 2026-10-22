@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Navbar from './components/Navbar.jsx'
+import GuidedTour from './components/GuidedTour.jsx'
 import HowToPlayModal from './components/HowToPlayModal.jsx'
 import About from './pages/About.jsx'
 import CaseFilesPlaceholder from './pages/CaseFilesPlaceholder.jsx'
@@ -237,6 +238,11 @@ function App() {
     })
   }, [recordActivity, updateProgress])
 
+  const dismissGuidedTour = useCallback(() => {
+    if (progress.tourCompleted) return
+    updateProgress((current) => (current.tourCompleted ? current : { ...current, tourCompleted: true }))
+  }, [progress.tourCompleted, updateProgress])
+
   const openInvestigationRecord = useCallback((type, id) => {
     if (type === 'evidence' && !discoveredEvidenceIds.has(id)) return
     setPendingSelection({ type, id })
@@ -312,6 +318,9 @@ function App() {
       <div className="page-shell" key={activeView}>
         {page}
       </div>
+      {activeView === 'investigation' && progress.tourCompleted === false && (
+        <GuidedTour onDismiss={dismissGuidedTour} />
+      )}
       <footer className="site-footer">
         <span>An interactive DSA mini-project</span>
         <span className="footer-separator" aria-hidden="true">•</span>

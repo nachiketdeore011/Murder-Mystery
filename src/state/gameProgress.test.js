@@ -51,6 +51,44 @@ describe('game progress persistence', () => {
     expect(result.progress.discoveredEvidenceIds).toEqual([])
   })
 
+  it('starts a fresh case with the guided tour still pending', () => {
+    expect(createInitialGameProgress(case001).tourCompleted).toBe(false)
+    expect(loadGameProgress({ storage, caseFile: case001 }).progress.tourCompleted).toBe(false)
+  })
+
+  it('migrates older saves so returning players are not pushed through the tour', () => {
+    const versionZero = { caseId: case001.id, schemaVersion: 0, discoveredEvidenceIds: ['E001'] }
+    const migratedZero = validateGameProgress(versionZero, { caseFile: case001, now: new Date('2026-02-01T00:00:00.000Z') })
+    expect(migratedZero.valid).toBe(true)
+    expect(migratedZero.progress.tourCompleted).toBe(true)
+
+    const versionOne = initialWith()
+    delete versionOne.tourCompleted
+    versionOne.schemaVersion = 1
+    const migratedOne = validateGameProgress(versionOne, { caseFile: case001 })
+    expect(migratedOne.valid).toBe(true)
+    expect(migratedOne.progress.tourCompleted).toBe(true)
+
+    const versionTwoWithoutFlag = initialWith()
+    delete versionTwoWithoutFlag.tourCompleted
+    const normalized = validateGameProgress(versionTwoWithoutFlag, { caseFile: case001 })
+    expect(normalized.valid).toBe(true)
+    expect(normalized.progress.tourCompleted).toBe(true)
+  })
+
+  it('persists a completed guided tour so it never shows again', () => {
+    const stored = saveGameProgress(initialWith({ tourCompleted: true }), { storage, caseFile: case001 })
+    expect(stored.ok).toBe(true)
+    expect(stored.progress.tourCompleted).toBe(true)
+    expect(loadGameProgress({ storage, caseFile: case001 }).progress.tourCompleted).toBe(true)
+  })
+
+  it('rejects a malformed guided-tour state', () => {
+    const result = validateGameProgress(initialWith({ tourCompleted: 'yes' }), { caseFile: case001 })
+    expect(result.valid).toBe(false)
+    expect(result.errors.join(' ')).toContain('guided-tour state')
+  })
+
   it('saves valid progress and restores it on load', () => {
     const saved = saveGameProgress(initialWith({ discoveredEvidenceIds: ['E001'] }), {
       storage,

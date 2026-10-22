@@ -51,7 +51,8 @@ function CaseResolution({ caseFile, completion, discoveredEvidenceIds, onResetPr
     relationships,
   }) : null, [caseFile, completion.selectedSuspectId, discoveredEvidenceIds, relationships, result.valid])
 
-  useEffect(() => headingRef.current?.focus(), [completion])
+  // preventScroll keeps the case resolution banner from yanking the page on mount.
+  useEffect(() => headingRef.current?.focus({ preventScroll: true }), [completion])
 
   const selectedSuspect = getRecord(caseFile.suspects, completion.selectedSuspectId)
   const outcome = result.valid ? OUTCOME_COPY[result.outcome] : null
@@ -243,7 +244,12 @@ function FinalAccusation({ caseFile, discoveredEvidenceIds, progress, onComplete
     relationships,
   }) : null, [caseFile, discoveredEvidenceIds, relationships, selectedSuspectId])
 
-  useEffect(() => headingRef.current?.focus(), [reviewing, progress.completion])
+  // Focus follows the review step, not the page load: moving focus on mount
+  // would pull the first-time player past the guided tour at the top.
+  useEffect(() => {
+    if (!reviewing) return
+    headingRef.current?.focus({ preventScroll: true })
+  }, [reviewing])
 
   useEffect(() => {
     if (progress.completion) return
