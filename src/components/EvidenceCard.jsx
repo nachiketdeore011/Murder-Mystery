@@ -1,4 +1,4 @@
-function EvidenceCard({ evidence, isDiscovered, onDiscover, onInspect }) {
+function EvidenceCard({ evidence, isDiscovered, locationName, onDiscover, onInspect }) {
   return (
     <article className={`evidence-card${isDiscovered ? ' is-discovered' : ' is-locked'}`} data-evidence-id={evidence.id}>
       <div className="evidence-card-heading">
@@ -18,10 +18,12 @@ function EvidenceCard({ evidence, isDiscovered, onDiscover, onInspect }) {
         <>
           <span aria-hidden="true" className="lock-mark">—</span>
           <h3>Evidence awaiting inspection</h3>
-          <p className="locked-copy">This record is sealed until you inspect the clue.</p>
+          <p className="locked-copy">
+            Sealed until you inspect it. {locationName ? `Filed in the ${locationName}.` : 'Filed in an unlisted room.'}
+          </p>
           <div className="evidence-card-footer">
             <span className="locked-label">Undiscovered</span>
-            <button className="inline-action" onClick={onDiscover} type="button">Inspect clue</button>
+            <button aria-label={`Inspect the clue filed in the ${locationName || 'unlisted room'}`} className="inline-action" onClick={onDiscover} type="button">Inspect clue</button>
           </div>
         </>
       )}

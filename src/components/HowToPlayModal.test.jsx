@@ -21,7 +21,7 @@ describe('how to play modal', () => {
   it('explains how a sealed clue opens up', () => {
     const markup = renderModal()
 
-    expect(markup).toContain('sealed until you uncover them')
+    expect(markup).toContain('sealed until you inspect their card')
     expect(markup).toContain('Crime Scene Map')
   })
 

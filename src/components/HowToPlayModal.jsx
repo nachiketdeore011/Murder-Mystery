@@ -119,9 +119,9 @@ function HowToPlayModal({ isOpen, onClose }) {
           ))}
         </ol>
         <p className="modal-hint">
-          Clues stay sealed until you uncover them, and every clue is filed in a
-          room on the Crime Scene Map. Exploring the map is how you learn which
-          room holds a clue.
+          Clues stay sealed until you inspect their card in the Clue Register.
+          Each sealed card names the room it was filed in, and the Crime Scene
+          Map shows the rooms you have already uncovered.
         </p>
         <p className="modal-note">The current case is fully playable and can be replayed. Algorithmic scores and deductions support investigation; they do not prove guilt.</p>
       </section>

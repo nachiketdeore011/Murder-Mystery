@@ -29,6 +29,13 @@ function timeToMinutes(timestamp) {
   return hour * 60 + Number(minuteText)
 }
 
+// Sealed clues cannot be opened from search, so the message names the room the
+// clue was filed in and the one action that uncovers it.
+export function sealedClueHint(evidenceId, locationName) {
+  const room = locationName ? ` It was filed in the ${locationName}.` : ''
+  return `${evidenceId} is still sealed.${room} Open the Clue Register and inspect the sealed card to uncover it.`
+}
+
 function RecordActions({ isBookmarked, onAddNote, onToggleBookmark, recordLabel }) {
   return (
     <div className="record-detail-actions">
@@ -173,8 +180,12 @@ function Investigation({
         selectDetail('evidence', result.id)
         return `Opened discovered evidence ${result.id}.`
       }
-      document.getElementById('evidence-title')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      return `${result.id} remains sealed. Search did not reveal the clue or change discovery progress.`
+      const sealedEvidence = caseIndex.getEvidenceById(result.id)
+      const sealedLocationName = sealedEvidence ? caseIndex.getLocationById(sealedEvidence.discoveredAt)?.name : null
+      const sealedCard = document.querySelector(`[data-evidence-id="${result.id}"]`)
+      if (sealedCard) sealedCard.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      else document.getElementById('evidence-title')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      return sealedClueHint(result.id, sealedLocationName)
     }
     if (result.type === 'suspect' || result.type === 'location') {
       selectDetail(result.type, result.id)
@@ -347,7 +358,7 @@ function Investigation({
           </div>
           <span className="section-count">{discoveredCount} of {evidenceTotal} discovered</span>
         </div>
-        <p className="section-intro">Inspect a sealed record to reveal its contents. Search and category filters apply to records already discovered.</p>
+        <p className="section-intro">Sealed clues unlock when you inspect their card here. Every sealed card names the room it was filed in, and the Crime Scene Map shows the rooms you have already uncovered.</p>
         <div className="evidence-controls">
           <label className="control-label">Search discovered evidence
             <input aria-label="Search evidence" onChange={(event) => setSearchTerm(event.target.value)} placeholder="Search titles and descriptions" type="search" value={searchTerm} />
@@ -373,6 +384,7 @@ function Investigation({
                   evidence={item}
                   isDiscovered={isDiscovered}
                   key={item.id}
+                  locationName={caseIndex.getLocationById(item.discoveredAt)?.name}
                   onDiscover={() => onDiscoverEvidence(item.id)}
                   onInspect={() => selectDetail('evidence', item.id)}
                 />
