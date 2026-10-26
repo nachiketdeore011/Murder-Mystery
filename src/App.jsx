@@ -257,6 +257,7 @@ function App() {
     case 'investigation':
       page = (
         <Investigation
+          activityLog={activityLog}
           caseFile={case001}
           discoveredEvidenceIds={discoveredEvidenceIds}
           onDiscoverEvidence={discoverEvidence}

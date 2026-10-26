@@ -356,6 +356,8 @@ button:disabled { cursor: not-allowed; opacity: 0.48; }
 .progress-track { height: 4px; overflow: hidden; background: rgba(230, 223, 207, 0.1); }
 .progress-fill { height: 100%; background: var(--color-gold); transition: width 220ms ease; }
 .progress-caption { margin-top: 9px; color: #8f968d; font-size: 9px; letter-spacing: 0.035em; }
+.progress-next-step { margin: 12px 0 0; padding: 9px 10px; border-left: 2px solid var(--color-gold); background: rgba(207, 191, 153, 0.07); color: #c8c2b3; font-size: 10px; line-height: 1.6; }
+.progress-next-step strong { display: block; margin-bottom: 3px; color: var(--color-gold); font-size: 9px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; }
 .investigation-section { margin-top: 48px; }
 .section-heading-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; margin-bottom: 18px; }
 .section-heading-row h2 { margin: 8px 0 0; color: #e9e2d4; font-family: var(--font-serif); font-size: 31px; font-weight: 400; letter-spacing: -0.02em; }

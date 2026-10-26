@@ -36,6 +36,26 @@ export function sealedClueHint(evidenceId, locationName) {
   return `${evidenceId} is still sealed.${room} Open the Clue Register and inspect the sealed card to uncover it.`
 }
 
+// One "what next" line for the progress card, derived only from data the page
+// already holds so every stage is testable without mounting the page.
+export function nextStepHint({ activityLog = [], caseFile = {}, discoveredEvidenceIds, progress = {} } = {}) {
+  const discovered = discoveredEvidenceIds instanceof Set
+    ? discoveredEvidenceIds
+    : new Set(Array.isArray(discoveredEvidenceIds) ? discoveredEvidenceIds : [])
+  const evidenceTotal = Array.isArray(caseFile.evidence) ? caseFile.evidence.length : 0
+  const suspects = Array.isArray(caseFile.suspects) ? caseFile.suspects : []
+  const reviewedSuspectIds = new Set((Array.isArray(activityLog) ? activityLog : [])
+    .filter((event) => event?.type === 'suspect-reviewed' && typeof event.recordId === 'string')
+    .map((event) => event.recordId))
+  const everySuspectReviewed = suspects.length > 0 && suspects.every((suspect) => reviewedSuspectIds.has(suspect.id))
+
+  if (progress.completion) return 'Accusation recorded — review the completed case or replay it.'
+  if (evidenceTotal > 0 && discovered.size >= evidenceTotal) return "You're ready to make a Final Accusation."
+  if (discovered.size === 0) return 'Start by exploring the Crime Scene Map.'
+  if (!everySuspectReviewed) return "Open each suspect's profile to review their account."
+  return 'Try the Deduction Lab to test a theory.'
+}
+
 function RecordActions({ isBookmarked, onAddNote, onToggleBookmark, recordLabel }) {
   return (
     <div className="record-detail-actions">
@@ -48,6 +68,7 @@ function RecordActions({ isBookmarked, onAddNote, onToggleBookmark, recordLabel 
 }
 
 function Investigation({
+  activityLog,
   caseFile,
   discoveredEvidenceIds,
   onDiscoverEvidence,
@@ -247,6 +268,7 @@ function Investigation({
           <div className="progress-numbers"><strong>{discoveredCount}<span> / {evidenceTotal}</span></strong><span>evidence records discovered</span></div>
           <ProgressBar label={`${progressPercent}% of evidence collected`} value={progressPercent} />
           <div className="progress-caption"><span>{progressPercent}% collected</span><span>Case {caseFile.id}</span></div>
+          <p className="progress-next-step"><strong>Next step</strong>{nextStepHint({ activityLog, caseFile, discoveredEvidenceIds, progress })}</p>
         </div>
       </section>
 
