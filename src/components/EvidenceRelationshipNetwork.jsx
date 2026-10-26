@@ -117,6 +117,7 @@ function EvidenceRelationshipNetwork({
         <div>
           <span className="section-kicker">DOCUMENTED CASE LINKS</span>
           <h2 id="evidence-network-title">Evidence Relationship Network</h2>
+          <span className="algorithm-tag">Graph relationships</span>
         </div>
         <span className="section-count">{visibleNodes.length} visible records · {visibleEdges.length} documented links</span>
       </div>

@@ -377,6 +377,7 @@ function Investigation({
           <div>
             <span className="section-kicker">CLUE REGISTER</span>
             <h2 id="evidence-title">Evidence</h2>
+            <span className="algorithm-tag">Hash table index · O(1) lookup</span>
           </div>
           <span className="section-count">{discoveredCount} of {evidenceTotal} discovered</span>
         </div>

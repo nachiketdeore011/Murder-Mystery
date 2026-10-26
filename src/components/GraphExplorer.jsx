@@ -149,6 +149,7 @@ function GraphExplorer({ locations, corridorWeights = [], discoveredEvidenceIds 
         <div>
           <span className="section-kicker">PHYSICAL CRIME SCENE</span>
           <h2 id="graph-explorer-title">Crime Scene Map</h2>
+          <span className="algorithm-tag">Graph · Dijkstra shortest path</span>
         </div>
         <span className="section-count">{vertices.length} locations · {edges.length} corridors</span>
       </div>

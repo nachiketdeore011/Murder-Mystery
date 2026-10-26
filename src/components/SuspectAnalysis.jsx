@@ -60,6 +60,7 @@ function SuspectAnalysis({ caseFile, caseIndex, discoveredEvidenceIds, onSelectE
         <div>
           <span className="section-kicker">DISCOVERED CLUES ONLY</span>
           <h2 id="suspect-analysis-title">Suspect Analysis</h2>
+          <span className="algorithm-tag">Ranking algorithm</span>
         </div>
         <span className="section-count">Investigation priority, not guilt</span>
       </div>

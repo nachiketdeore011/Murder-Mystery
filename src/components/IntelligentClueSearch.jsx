@@ -71,7 +71,7 @@ function IntelligentClueSearch({ clueSearchIndex, discoveredEvidenceIds, onSelec
           <span className="section-kicker">WORD-PREFIX INDEX</span>
           <h2 id="intelligent-search-title">Intelligent Clue Search</h2>
         </div>
-        <span className="section-count">Trie · case records</span>
+        <span className="algorithm-tag">Trie · prefix search</span>
       </div>
       <p className="section-intro">Search words from evidence, profiles, rooms and reported events. Prefix matching starts at the beginning of a word; it does not search inside a word.</p>
 
