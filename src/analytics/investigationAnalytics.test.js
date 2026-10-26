@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { calculateInvestigationMetrics } from './investigationAnalytics.js'
+import { calculateInvestigationMetrics, summarizeSessionActivity } from './investigationAnalytics.js'
 import { appendSessionActivity, getActivityDescription } from './activityLog.js'
 
 const caseFile = {
@@ -107,5 +107,91 @@ describe('session activity log', () => {
       id: 'current', type: 'location-explored', occurredAt: '2026-01-01T00:02:00.000Z', recordType: 'location', recordId: 'L002',
     }, 3)
     expect(bounded.map(({ id }) => id)).toEqual(['prior-3', 'reset', 'current'])
+  })
+})
+
+describe('summarizeSessionActivity', () => {
+  const sessionLog = [
+    { id: 'session-1', type: 'location-explored', occurredAt: '2026-01-01T00:00:00.000Z', recordType: 'location', recordId: 'L001', label: 'Study' },
+    { id: 'session-2', type: 'evidence-discovered', occurredAt: '2026-01-01T00:01:00.000Z', recordType: 'evidence', recordId: 'E001', label: 'Open clue' },
+    { id: 'session-3', type: 'evidence-discovered', occurredAt: '2026-01-01T00:02:00.000Z', recordType: 'evidence', recordId: 'E002' },
+    { id: 'session-4', type: 'suspect-reviewed', occurredAt: '2026-01-01T00:03:00.000Z', recordType: 'suspect', recordId: 'S001', label: 'One' },
+    { id: 'session-5', type: 'deduction-evaluated', occurredAt: '2026-01-01T00:04:00.000Z' },
+    { id: 'session-6', type: 'accusation-submitted', occurredAt: '2026-01-01T00:05:00.000Z' },
+    { id: 'session-7', type: 'confusion-reported', occurredAt: '2026-01-01T00:06:00.000Z', label: 'Could not find the sealed clues' },
+  ]
+
+  it('summarizes sections, discovery order, the accusation and confusion notes', () => {
+    const summary = summarizeSessionActivity({
+      activityLog: sessionLog,
+      caseFile,
+      discoveredEvidenceIds: new Set(['E001']),
+    })
+
+    expect(summary.eventCount).toBe(sessionLog.length)
+    expect(summary.sectionsVisited[0]).toEqual({ section: 'Clue register', visits: 2 })
+    expect(summary.sectionsVisited.map((entry) => entry.section)).toContain('Deduction Lab')
+    expect(summary.sectionsVisited.map((entry) => entry.section)).toContain('Confusion feedback')
+    expect(summary.discoveredOverTime).toEqual([
+      { recordId: 'E001', label: 'Open clue', occurredAt: '2026-01-01T00:01:00.000Z', stillDiscovered: true },
+      { recordId: 'E002', label: 'SECRET cobaltquartz clue', occurredAt: '2026-01-01T00:02:00.000Z', stillDiscovered: false },
+    ])
+    expect(summary.accusationAttempts).toBe(1)
+    expect(summary.caseSolved).toBe(false)
+    expect(summary.confusionReports).toEqual([{ occurredAt: '2026-01-01T00:06:00.000Z', note: 'Could not find the sealed clues' }])
+    expect(summary.firstActivityAt).toBe('2026-01-01T00:00:00.000Z')
+    expect(summary.lastActivityAt).toBe('2026-01-01T00:06:00.000Z')
+  })
+
+  it('counts a solved case as an accusation attempt', () => {
+    const summary = summarizeSessionActivity({
+      activityLog: [{ id: 'session-1', type: 'case-solved', occurredAt: '2026-01-01T00:00:00.000Z' }],
+      caseFile,
+      discoveredEvidenceIds: new Set(),
+    })
+
+    expect(summary.accusationAttempts).toBe(1)
+    expect(summary.caseSolved).toBe(true)
+  })
+
+  it('ignores everything before the most recent reset', () => {
+    const summary = summarizeSessionActivity({
+      activityLog: [
+        { id: 'session-1', type: 'evidence-discovered', occurredAt: '2026-01-01T00:00:00.000Z', recordId: 'E001', label: 'Open clue' },
+        { id: 'session-2', type: 'progress-reset', occurredAt: '2026-01-01T00:01:00.000Z' },
+      ],
+      caseFile,
+      discoveredEvidenceIds: new Set(),
+    })
+
+    expect(summary.eventCount).toBe(0)
+    expect(summary.discoveredOverTime).toEqual([])
+    expect(summary.sectionsVisited).toEqual([])
+  })
+
+  it('returns an empty summary for a session with no recorded actions', () => {
+    const summary = summarizeSessionActivity({ activityLog: [], caseFile, discoveredEvidenceIds: new Set() })
+
+    expect(summary).toMatchObject({
+      eventCount: 0,
+      sectionsVisited: [],
+      discoveredOverTime: [],
+      accusationAttempts: 0,
+      caseSolved: false,
+      confusionReports: [],
+      firstActivityAt: null,
+      lastActivityAt: null,
+    })
+  })
+})
+
+describe('confusion feedback activity', () => {
+  it('accepts a confusion report and describes it for the activity feed', () => {
+    const next = appendSessionActivity([], {
+      id: 'session-1', type: 'confusion-reported', occurredAt: '2026-01-01T00:00:00.000Z', label: 'Where do sealed clues open?',
+    })
+
+    expect(next).toHaveLength(1)
+    expect(getActivityDescription(next[0])).toBe('Player reported confusion: Where do sealed clues open?')
   })
 })

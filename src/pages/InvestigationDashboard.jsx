@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import AlgorithmPerformanceLab from '../components/AlgorithmPerformanceLab.jsx'
 import ProgressBar from '../components/ProgressBar.jsx'
-import { calculateInvestigationMetrics } from '../analytics/investigationAnalytics.js'
+import { calculateInvestigationMetrics, summarizeSessionActivity } from '../analytics/investigationAnalytics.js'
 import { getActivityDescription } from '../analytics/activityLog.js'
 import { evaluateTheory } from '../algorithms/deductionEngine.js'
 import { rankSuspects } from '../algorithms/suspectRanking.js'
@@ -72,6 +72,11 @@ function InvestigationDashboard({
     deductionChecks,
     caseStatus,
   }), [caseFile, discoveredEvidenceIds, progress, activityLog, deductionChecks, caseStatus])
+  const sessionSummary = useMemo(() => summarizeSessionActivity({
+    activityLog,
+    caseFile,
+    discoveredEvidenceIds,
+  }), [activityLog, caseFile, discoveredEvidenceIds])
   const discoveredIdSet = useMemo(() => new Set(discoveredEvidenceIds), [discoveredEvidenceIds])
   const reviewedSuspects = new Set(metrics.suspects.reviewedIds)
   const reviewedTimeline = new Set(metrics.timeline.reviewedIds)
@@ -174,6 +179,41 @@ function InvestigationDashboard({
           {latestActivity.map((event) => <li key={event.id}><time>{formatTime(event.occurredAt)}</time><span className="analytics-activity-mark" aria-hidden="true" /><div><strong>{getActivityDescription(event)}</strong>{event.recordId && <small>{event.recordType} ID {event.recordId}</small>}</div></li>)}
         </ol> : <p className="analytics-empty">No investigation actions have been recorded in this session yet.</p>}
       </section>
+
+      <details className="analytics-section session-summary">
+        <summary>Session summary <span className="session-summary-count">{sessionSummary.eventCount} recorded action{sessionSummary.eventCount === 1 ? '' : 's'}</span></summary>
+        <p className="analytics-section-intro">A developer and teaching aid for the current browser session only. Nothing here is saved or sent anywhere.</p>
+        <div className="analytics-overview-grid">
+          <div>
+            <span className="section-kicker">SECTIONS VISITED</span>
+            {sessionSummary.sectionsVisited.length ? (
+              <ul className="session-summary-list">
+                {sessionSummary.sectionsVisited.map((entry) => (
+                  <li key={entry.section}><span>{entry.section}</span><strong>{entry.visits}</strong></li>
+                ))}
+              </ul>
+            ) : <p className="analytics-empty">No section has been used yet in this session.</p>}
+          </div>
+          <div>
+            <span className="section-kicker">CLUES DISCOVERED IN ORDER</span>
+            {sessionSummary.discoveredOverTime.length ? (
+              <ol className="session-summary-list">
+                {sessionSummary.discoveredOverTime.map((entry) => (
+                  <li key={entry.recordId + entry.occurredAt}><span>{entry.recordId} · {entry.label}</span><strong>{entry.stillDiscovered ? 'discovered' : 'since reset'}</strong></li>
+                ))}
+              </ol>
+            ) : <p className="analytics-empty">No clue has been discovered in this session yet.</p>}
+          </div>
+        </div>
+        <p className="analytics-note">Accusation attempts this session: {sessionSummary.accusationAttempts}{sessionSummary.caseSolved ? ' (case solved)' : ''}. Confusion reports: {sessionSummary.confusionReports.length}.</p>
+        {sessionSummary.confusionReports.length > 0 && (
+          <ul className="session-summary-list session-summary-feedback">
+            {sessionSummary.confusionReports.map((report) => (
+              <li key={report.occurredAt + report.note}><span>{formatTime(report.occurredAt)}</span><strong>{report.note || 'No detail given'}</strong></li>
+            ))}
+          </ul>
+        )}
+      </details>
 
       <AlgorithmPerformanceLab caseFile={caseFile} discoveredEvidenceIds={discoveredEvidenceIds} onActivity={onActivity} onOpenRecord={openRecord} />
 

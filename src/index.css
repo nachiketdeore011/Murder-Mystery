@@ -240,11 +240,11 @@ button:disabled { cursor: not-allowed; opacity: 0.48; }
 .about-note { max-width: 580px; margin: 24px 0 0; color: #7f8781; font-size: 12px; line-height: 1.7; }
 
 .modal-backdrop { position: fixed; z-index: 10; inset: 0; display: grid; place-items: center; overflow-y: auto; padding: 24px; background: rgba(4, 7, 8, 0.76); backdrop-filter: blur(5px); animation: fade-in 180ms ease both; }
-.how-to-play-modal { width: min(100%, 540px); padding: 32px 36px 30px; border: 1px solid rgba(207, 191, 153, 0.31); background: #171d1e; box-shadow: 0 28px 90px rgba(0, 0, 0, 0.5); animation: modal-rise 240ms ease both; }
+.how-to-play-modal,.confusion-modal { width: min(100%, 540px); padding: 32px 36px 30px; border: 1px solid rgba(207, 191, 153, 0.31); background: #171d1e; box-shadow: 0 28px 90px rgba(0, 0, 0, 0.5); animation: modal-rise 240ms ease both; }
 .modal-topline { display: flex; align-items: center; justify-content: space-between; }
 .modal-close { display: grid; width: 34px; height: 34px; place-items: center; border: 1px solid rgba(207, 191, 153, 0.22); background: transparent; color: #b4b2a6; cursor: pointer; font-size: 23px; line-height: 1; transition: border-color 160ms ease, color 160ms ease; }
 .modal-close:hover { border-color: var(--color-gold); color: #f0e4cb; }
-.how-to-play-modal h2 { margin: 11px 0 0; color: #eee6d6; font-family: var(--font-serif); font-size: 39px; font-weight: 400; letter-spacing: -0.025em; }
+.how-to-play-modal h2,.confusion-modal h2 { margin: 11px 0 0; color: #eee6d6; font-family: var(--font-serif); font-size: 39px; font-weight: 400; letter-spacing: -0.025em; }
 .modal-intro { margin: 12px 0 0; color: #a5aaa2; font-size: 13px; line-height: 1.7; }
 .instruction-list { display: grid; gap: 0; margin: 24px 0 0; padding: 0; list-style: none; }
 .instruction-list li { display: grid; min-height: 48px; grid-template-columns: 40px 1fr; align-items: center; border-top: 1px solid rgba(207, 191, 153, 0.12); color: #ddd9cf; font-size: 12px; line-height: 1.55; }
@@ -254,6 +254,19 @@ button:disabled { cursor: not-allowed; opacity: 0.48; }
 .instruction-text { color: #ddd9cf; font-size: 12px; line-height: 1.55; }
 .modal-hint { margin: 18px 0 0; padding: 11px 13px; border: 1px solid rgba(207, 191, 153, 0.16); background: rgba(12, 16, 16, 0.44); color: #a5aaa2; font-size: 11px; line-height: 1.7; }
 .modal-note { margin: 20px 0 0; color: #7f8781; font-size: 10px; letter-spacing: 0.025em; }
+.confusion-field { display: grid; gap: 7px; margin: 20px 0 0; color: #b6a77f; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; }
+.confusion-field textarea { padding: 10px 11px; border: 1px solid rgba(207, 191, 153, 0.24); background: rgba(10, 14, 14, 0.7); color: #e6e0d4; font: inherit; font-size: 12px; line-height: 1.6; resize: vertical; text-transform: none; }
+.confusion-field textarea:focus-visible { outline: 2px solid var(--color-gold); outline-offset: 1px; }
+.confusion-actions { display: flex; gap: 9px; margin: 20px 0 0; }
+.confusion-trigger { white-space: nowrap; }
+.session-summary { padding: 18px; border: 1px solid rgba(207, 191, 153, 0.14); background: rgba(12, 16, 16, 0.52); }
+.session-summary > summary { cursor: pointer; color: #e3dccf; font-family: var(--font-serif); font-size: 18px; }
+.session-summary > summary:focus-visible { outline: 2px solid var(--color-gold); outline-offset: 3px; }
+.session-summary-count { margin-left: 10px; color: #b6a77f; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; }
+.session-summary-list { display: grid; gap: 5px; margin: 10px 0 0; padding: 0; list-style: none; }
+.session-summary-list li { display: flex; justify-content: space-between; gap: 12px; padding: 5px 0; border-bottom: 1px solid rgba(207, 191, 153, 0.1); color: #b5b8ae; font-size: 11px; }
+.session-summary-list strong { color: #d8d2c4; font-weight: 500; }
+.session-summary-feedback strong { font-weight: 400; font-style: italic; }
 
 @keyframes reveal-page { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes guided-tour-rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
@@ -319,8 +332,8 @@ button:disabled { cursor: not-allowed; opacity: 0.48; }
   .scene-index { top: 22px; right: 21px; font-size: 7px; }
   .archive-entry { gap: 12px; padding-right: 0; padding-left: 0; }
   .archive-entry-state { max-width: 72px; font-size: 7px; line-height: 1.6; text-align: right; white-space: normal; }
-  .how-to-play-modal { padding: 23px 22px 24px; }
-  .how-to-play-modal h2 { font-size: 34px; }
+  .how-to-play-modal,.confusion-modal { padding: 23px 22px 24px; }
+  .how-to-play-modal h2,.confusion-modal h2 { font-size: 34px; }
   .guided-tour-inner { width: calc(100% - 34px); }
   .guided-tour-actions { flex-direction: column-reverse; }
   .guided-tour-actions .button { width: 100%; }

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Navbar from './components/Navbar.jsx'
+import ConfusionFeedbackModal from './components/ConfusionFeedbackModal.jsx'
 import GuidedTour from './components/GuidedTour.jsx'
 import HowToPlayModal from './components/HowToPlayModal.jsx'
 import About from './pages/About.jsx'
@@ -31,6 +32,7 @@ function createSaveStatus(loadResult) {
 function App() {
   const [activeView, setActiveView] = useState('home')
   const [isHowToPlayOpen, setIsHowToPlayOpen] = useState(false)
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false)
   const [initialLoad] = useState(() => loadGameProgress({ caseFile: case001 }))
   const [progress, setProgress] = useState(initialLoad.progress)
   const [saveStatus, setSaveStatus] = useState(() => createSaveStatus(initialLoad))
@@ -53,6 +55,10 @@ function App() {
 
   const closeHowToPlay = useCallback(() => {
     setIsHowToPlayOpen(false)
+  }, [])
+
+  const closeFeedback = useCallback(() => {
+    setIsFeedbackOpen(false)
   }, [])
 
   const navigate = (view) => {
@@ -79,6 +85,10 @@ function App() {
     }
     setActivityLog((current) => appendSessionActivity(current, event))
   }, [])
+
+  const reportConfusion = useCallback((note) => {
+    recordActivity('confusion-reported', { label: note || 'No detail given' })
+  }, [recordActivity])
 
   const discoverEvidence = useCallback((evidenceId) => {
     const evidence = case001.evidence.find((record) => record.id === evidenceId)
@@ -275,6 +285,7 @@ function App() {
           onInitialSelectionHandled={consumePendingSelection}
           onJournalDraftDirtyChange={setHasUnsavedJournalDraft}
           hasUnsavedJournalDraft={hasUnsavedJournalDraft}
+          onOpenFeedback={() => setIsFeedbackOpen(true)}
         />
       )
       break
@@ -328,6 +339,7 @@ function App() {
         <span>Case files are fictional</span>
       </footer>
       <HowToPlayModal isOpen={isHowToPlayOpen} onClose={closeHowToPlay} />
+      <ConfusionFeedbackModal isOpen={isFeedbackOpen} onClose={closeFeedback} onSubmit={reportConfusion} />
       <span className="ambient-grain" aria-hidden="true" />
     </div>
   )

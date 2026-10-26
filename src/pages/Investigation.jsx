@@ -84,6 +84,7 @@ function Investigation({
   hasUnsavedJournalDraft,
   onCompleteAccusation,
   onActivity,
+  onOpenFeedback,
   initialSelection,
   onInitialSelectionHandled,
 }) {
@@ -246,6 +247,7 @@ function Investigation({
         <button className="button button-primary" onClick={() => document.getElementById('final-accusation')?.scrollIntoView({ behavior: 'smooth', block: 'start' })} type="button">
           {progress.completion ? 'Review Completed Case' : 'Make Final Accusation'}
         </button>
+        <button className="button button-secondary confusion-trigger" onClick={onOpenFeedback} type="button">Something confusing?</button>
       </header>
 
       <nav aria-label="Map and relationship tools" className="investigation-map-nav">

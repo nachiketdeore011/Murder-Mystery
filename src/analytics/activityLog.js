@@ -14,6 +14,7 @@ const ALLOWED_ACTIVITY_TYPES = new Set([
   'bookmark-removed',
   'accusation-submitted',
   'case-solved',
+  'confusion-reported',
   'progress-reset',
   'replay-started',
 ])
@@ -56,6 +57,7 @@ export function getActivityDescription(event) {
   if (event?.type === 'bookmark-removed') return 'Bookmark removed: ' + (event.label || 'record')
   if (event?.type === 'case-solved') return 'The case was solved after a confirmed accusation'
   if (event?.type === 'accusation-submitted') return 'A final accusation was submitted'
+  if (event?.type === 'confusion-reported') return 'Player reported confusion: ' + (event.label || 'no detail given')
   if (event?.type === 'replay-started') return 'A new investigation replay was started'
   if (event?.type === 'progress-reset') return 'Investigation progress was reset'
   return 'Investigation activity recorded'

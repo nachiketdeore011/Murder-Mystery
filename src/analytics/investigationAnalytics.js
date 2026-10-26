@@ -106,4 +106,76 @@ export function calculateInvestigationMetrics({
   }
 }
 
+const SECTION_BY_EVENT_TYPE = {
+  'evidence-discovered': 'Clue register',
+  'evidence-reviewed': 'Clue register',
+  'suspect-reviewed': 'Suspects',
+  'location-explored': 'Crime Scene Map',
+  'timeline-reviewed': 'Timeline',
+  'deduction-evaluated': 'Deduction Lab',
+  'journal-entry-saved': 'Investigation Journal',
+  'journal-entry-updated': 'Investigation Journal',
+  'journal-entry-deleted': 'Investigation Journal',
+  'bookmark-added': 'Bookmarks',
+  'bookmark-removed': 'Bookmarks',
+  'accusation-submitted': 'Final Accusation',
+  'case-solved': 'Final Accusation',
+  'confusion-reported': 'Confusion feedback',
+}
+
+/**
+ * Summarize the current browser session from its activity log: which sections
+ * were used, the order clues were discovered in, how far the accusation got,
+ * and any confusion a player reported. This is a developer and teaching aid;
+ * nothing here is persisted, and nothing leaves the browser.
+ */
+export function summarizeSessionActivity({ activityLog = [], caseFile = {}, discoveredEvidenceIds = new Set() } = {}) {
+  const events = Array.isArray(activityLog) ? activityLog : []
+  let latestResetIndex = -1
+  for (let index = 0; index < events.length; index += 1) {
+    if (events[index]?.type === 'progress-reset' || events[index]?.type === 'replay-started') latestResetIndex = index
+  }
+  const sessionEvents = events.slice(latestResetIndex + 1)
+  const discoveredIds = toSet(discoveredEvidenceIds)
+  const evidence = Array.isArray(caseFile.evidence) ? caseFile.evidence : []
+  const titleById = new Map(evidence.map((record) => [record?.id, record?.title]))
+  const sectionCounts = new Map()
+  const discoveredOverTime = []
+  const confusionReports = []
+  let accusationAttempts = 0
+  let solvedCount = 0
+
+  for (const event of sessionEvents) {
+    const section = SECTION_BY_EVENT_TYPE[event?.type]
+    if (section) sectionCounts.set(section, (sectionCounts.get(section) || 0) + 1)
+    if (event?.type === 'evidence-discovered' && typeof event.recordId === 'string') {
+      discoveredOverTime.push({
+        recordId: event.recordId,
+        label: event.label || titleById.get(event.recordId) || event.recordId,
+        occurredAt: event.occurredAt,
+        stillDiscovered: discoveredIds.has(event.recordId),
+      })
+    }
+    if (event?.type === 'accusation-submitted') accusationAttempts += 1
+    if (event?.type === 'case-solved') {
+      accusationAttempts += 1
+      solvedCount += 1
+    }
+    if (event?.type === 'confusion-reported') confusionReports.push({ occurredAt: event.occurredAt, note: event.label || '' })
+  }
+
+  return {
+    eventCount: sessionEvents.length,
+    sectionsVisited: [...sectionCounts.entries()]
+      .map(([section, visits]) => ({ section, visits }))
+      .sort((left, right) => right.visits - left.visits || left.section.localeCompare(right.section)),
+    discoveredOverTime,
+    accusationAttempts,
+    caseSolved: solvedCount > 0,
+    confusionReports,
+    firstActivityAt: sessionEvents[0]?.occurredAt ?? null,
+    lastActivityAt: sessionEvents[sessionEvents.length - 1]?.occurredAt ?? null,
+  }
+}
+
 export default calculateInvestigationMetrics
