@@ -10,7 +10,7 @@ const OUTCOME_COPY = {
   correct_incomplete: { title: 'Correct suspect, incomplete case', eyebrow: 'FINAL ACCUSATION · PARTIAL SUPPORT', tone: 'caution' },
   promising_reasoning_incorrect: { title: 'Promising clues, incorrect accusation', eyebrow: 'FINAL ACCUSATION · REVIEW THE THEORY', tone: 'caution' },
   incorrect_accusation: { title: 'The accusation is not supported', eyebrow: 'FINAL ACCUSATION · CASE REVIEW', tone: 'warning' },
-  insufficient_evidence: { title: 'Not enough evidence to resolve the case', eyebrow: 'FINAL ACCUSATION · INCONCLUSIVE', tone: 'caution' },
+  insufficient_evidence: { title: 'Not enough clues to resolve the case', eyebrow: 'FINAL ACCUSATION · INCONCLUSIVE', tone: 'caution' },
 }
 
 function getRecord(records, id) {
@@ -73,7 +73,7 @@ function CaseResolution({ caseFile, completion, discoveredEvidenceIds, onResetPr
     }
     setReplayMessage(reset?.ok === false
       ? 'The current session was reset, but browser storage could not confirm deletion. Check the save status before reloading.'
-      : 'A new investigation has started. Your previous case record was cleared from this save.')
+      : 'A new investigation has started. Your previous case file was cleared from this save.')
     setConfirmReplay(false)
   }
 
@@ -82,7 +82,7 @@ function CaseResolution({ caseFile, completion, discoveredEvidenceIds, onResetPr
       <div className={"resolution-banner is-" + (outcome?.tone || 'warning')}>
         <span className="section-kicker">{outcome?.eyebrow || 'COMPLETED CASE · SAVE VALIDATION'}</span>
         <h2 id="case-resolution-title" ref={headingRef} tabIndex={-1}>{outcome?.title || 'Completed accusation could not be reviewed'}</h2>
-        <p>{result.valid ? result.feedback : 'This saved accusation no longer matches the available case records. Your investigation evidence, journal and bookmarks remain intact.'}</p>
+        <p>{result.valid ? result.feedback : 'This saved accusation no longer matches the available clues. Your investigation journal and bookmarks remain intact.'}</p>
       </div>
 
       {result.valid && (
@@ -97,7 +97,7 @@ function CaseResolution({ caseFile, completion, discoveredEvidenceIds, onResetPr
             <article className="resolution-card">
               <span className="detail-label">Evidence support</span>
               <strong>{result.supportingEvidenceIds.length} supporting · {result.contextualEvidenceIds.length} contextual</strong>
-              <span>{missingEssential.length ? missingEssential.length + ' essential record' + (missingEssential.length === 1 ? '' : 's') + ' not cited' : 'All essential records cited'}</span>
+              <span>{missingEssential.length ? missingEssential.length + ' essential clue' + (missingEssential.length === 1 ? '' : 's') + ' not cited' : 'All essential clues cited'}</span>
               <span className="resolution-assessment">Assessment: {result.reasoningAssessment.replaceAll('_', ' ')}</span>
             </article>
             <article className="resolution-card">
@@ -132,7 +132,7 @@ function CaseResolution({ caseFile, completion, discoveredEvidenceIds, onResetPr
 
           <section className="resolution-detail-card" aria-labelledby="resolution-evidence-title">
             <div className="section-heading-row">
-              <div><span className="section-kicker">PLAYER-CITED RECORDS</span><h3 id="resolution-evidence-title">Evidence in the accusation</h3></div>
+              <div><span className="section-kicker">PLAYER-CITED CLUES</span><h3 id="resolution-evidence-title">Clues in the accusation</h3></div>
               <span className="section-count">{selectedEvidence.length} cited</span>
             </div>
             {selectedEvidence.length ? (
@@ -143,29 +143,29 @@ function CaseResolution({ caseFile, completion, discoveredEvidenceIds, onResetPr
                     : result.contextualEvidenceIds.includes(item.id)
                       ? 'Relevant context; not decisive'
                       : 'No configured solution link'
-                  return <li key={item.id}><span>{item.id}</span><strong>{item.title}</strong><small>{role}</small><button className="resolution-record-link" onClick={() => onSelectEvidence?.(item.id)} type="button">Open discovered record</button></li>
+                  return <li key={item.id}><span>{item.id}</span><strong>{item.title}</strong><small>{role}</small><button className="resolution-record-link" onClick={() => onSelectEvidence?.(item.id)} type="button">Open discovered clue</button></li>
                 })}
               </ul>
-            ) : <p>No evidence was cited in this accusation.</p>}
+            ) : <p>No clues were cited in this accusation.</p>}
             {missingEssential.length > 0 && (
               <div className="resolution-missed-clues">
-                <h4>Essential records not cited</h4>
+                <h4>Essential clues not cited</h4>
                 <ul>
                   {missingEssential.map((id) => {
                     const record = getRecord(caseFile.evidence, id)
                     const discovered = discoveredEvidenceIds.has(id)
-                    return <li key={id}><span>{id}</span>{discovered ? record?.title : 'Record not discovered during this run'}</li>
+                    return <li key={id}><span>{id}</span>{discovered ? record?.title : 'Clue not discovered during this run'}</li>
                   })}
                 </ul>
               </div>
             )}
-            {result.irrelevantEvidenceIds.length > 0 && <p className="resolution-caveat">{result.irrelevantEvidenceIds.length} cited record{result.irrelevantEvidenceIds.length === 1 ? ' has' : 's have'} no configured connection to this solution. No meaning was inferred from the written explanation.</p>}
+            {result.irrelevantEvidenceIds.length > 0 && <p className="resolution-caveat">{result.irrelevantEvidenceIds.length} cited clue{result.irrelevantEvidenceIds.length === 1 ? ' has' : 's have'} no configured connection to this solution. No meaning was inferred from the written explanation.</p>}
           </section>
 
           <section className="resolution-detail-card" aria-labelledby="accusation-theory-title">
             <h3 id="accusation-theory-title">Your explanation</h3>
             <blockquote className="player-accusation-text">{completion.explanation}</blockquote>
-            <p className="resolution-caveat">The game checks your selected suspect and cited evidence IDs. It does not use natural-language AI to judge the meaning or quality of your written theory.</p>
+            <p className="resolution-caveat">The game checks your selected suspect and cited clue IDs. It does not use natural-language AI to judge the meaning or quality of your written theory.</p>
           </section>
 
           <section className="resolution-detail-card" aria-labelledby="resolution-analysis-title">
@@ -174,7 +174,7 @@ function CaseResolution({ caseFile, completion, discoveredEvidenceIds, onResetPr
             <div className="resolution-analysis-grid">
               <article>
                 <span className="detail-label">Investigation priority</span>
-                <strong>{priority?.priorityLabel || 'Insufficient evidence'} · score {priority?.score ?? 0}</strong>
+                <strong>{priority?.priorityLabel || 'Insufficient clues'} · score {priority?.score ?? 0}</strong>
                 <p>{priority?.explanation || 'No ranking result is available.'}</p>
                 <small>This score prioritizes follow-up; it is not a guilt probability or verdict.</small>
               </article>
@@ -186,8 +186,8 @@ function CaseResolution({ caseFile, completion, discoveredEvidenceIds, onResetPr
             </div>
             {deduction && (
               <div className="resolution-deduction-groups">
-                <div><h4>Supported follow-up facts</h4>{deduction.supportingFacts.length ? <ul>{deduction.supportingFacts.map((fact) => <li key={fact.id}><strong>{fact.title}</strong><span>{fact.explanation}</span>{fact.evidenceId && <button className="resolution-record-link" onClick={() => onSelectEvidence?.(fact.evidenceId)} type="button">Open discovered record · {fact.evidenceId}</button>}</li>)}</ul> : <p>No discovered support is linked to this profile.</p>}</div>
-                <div><h4>Contradictions</h4>{deduction.contradictingFacts.length ? <ul>{deduction.contradictingFacts.map((fact) => <li key={fact.id}><strong>{fact.title}</strong><span>{fact.explanation}</span>{fact.evidenceId && <button className="resolution-record-link" onClick={() => onSelectEvidence?.(fact.evidenceId)} type="button">Open discovered record · {fact.evidenceId}</button>}</li>)}</ul> : <p>No explicit contradiction was established.</p>}</div>
+                <div><h4>Supported follow-up facts</h4>{deduction.supportingFacts.length ? <ul>{deduction.supportingFacts.map((fact) => <li key={fact.id}><strong>{fact.title}</strong><span>{fact.explanation}</span>{fact.evidenceId && <button className="resolution-record-link" onClick={() => onSelectEvidence?.(fact.evidenceId)} type="button">Open discovered clue · {fact.evidenceId}</button>}</li>)}</ul> : <p>No discovered support is linked to this profile.</p>}</div>
+                <div><h4>Contradictions</h4>{deduction.contradictingFacts.length ? <ul>{deduction.contradictingFacts.map((fact) => <li key={fact.id}><strong>{fact.title}</strong><span>{fact.explanation}</span>{fact.evidenceId && <button className="resolution-record-link" onClick={() => onSelectEvidence?.(fact.evidenceId)} type="button">Open discovered clue · {fact.evidenceId}</button>}</li>)}</ul> : <p>No explicit contradiction was established.</p>}</div>
                 <div><h4>Unresolved questions</h4>{deduction.unresolvedQuestions.length ? <ul>{deduction.unresolvedQuestions.map((question) => <li key={question}>{question}</li>)}</ul> : <p>No unresolved questions were returned by the rule evaluator.</p>}</div>
               </div>
             )}
@@ -326,10 +326,10 @@ function FinalAccusation({ caseFile, discoveredEvidenceIds, progress, onComplete
           <div className="accusation-readiness">
             <div>
               <span className="detail-label">Investigation readiness</span>
-              <strong>{discoveredRecords.length} / {caseFile.evidence.length} records discovered · {progressPercent}%</strong>
+              <strong>{discoveredRecords.length} / {caseFile.evidence.length} clues discovered · {progressPercent}%</strong>
               <span>{progress.journalEntries.length} journal entries · {progress.bookmarks.suspects.length + progress.bookmarks.evidence.length + progress.bookmarks.locations.length} bookmarks</span>
             </div>
-            <p>{discoveredRecords.length ? 'You may accuse now. A complete evidence collection is not required, though a limited record may leave important questions open.' : 'No evidence has been discovered. You may still continue, but the accusation will be marked as insufficiently supported.'}</p>
+            <p>{discoveredRecords.length ? 'You may accuse now. A complete clue collection is not required, though a limited set of clues may leave important questions open.' : 'No clue has been discovered. You may still continue, but the accusation will be marked as insufficiently supported.'}</p>
           </div>
           <nav aria-label="Optional investigation review" className="accusation-review-links">
             <a href="#suspect-analysis">Review Suspect Analysis</a>
@@ -363,8 +363,8 @@ function FinalAccusation({ caseFile, discoveredEvidenceIds, progress, onComplete
             </fieldset>
 
             <fieldset className="accusation-fieldset">
-              <legend><span className="section-kicker">02 · CITE DISCOVERED RECORDS</span></legend>
-              <p className="section-intro">Only evidence already discovered is selectable. You may cite any number of records; selection does not change discovery progress.</p>
+              <legend><span className="section-kicker">02 · CITE DISCOVERED CLUES</span></legend>
+              <p className="section-intro">Only clues already discovered are selectable. You may cite any number of them; selection does not change discovery progress.</p>
               {discoveredRecords.length ? (
                 <div className="accusation-evidence-grid">
                   {discoveredRecords.map((item) => (
@@ -374,12 +374,12 @@ function FinalAccusation({ caseFile, discoveredEvidenceIds, progress, onComplete
                     </label>
                   ))}
                 </div>
-              ) : <p className="empty-results">No discovered evidence is available to cite.</p>}
-              {selectedEvidence.length > 0 && <div className="selected-accusation-evidence"><span className="detail-label">Selected records · {selectedEvidence.length}</span><ul>{selectedEvidence.map((item) => <li key={item.id}><span>{item.id} · {item.title}</span><button aria-label={"Remove " + item.title + " from accusation"} onClick={() => toggleEvidence(item.id)} type="button">Remove</button></li>)}</ul></div>}
+              ) : <p className="empty-results">No discovered clues are available to cite.</p>}
+              {selectedEvidence.length > 0 && <div className="selected-accusation-evidence"><span className="detail-label">Selected clues · {selectedEvidence.length}</span><ul>{selectedEvidence.map((item) => <li key={item.id}><span>{item.id} · {item.title}</span><button aria-label={"Remove " + item.title + " from accusation"} onClick={() => toggleEvidence(item.id)} type="button">Remove</button></li>)}</ul></div>}
             </fieldset>
 
             <label className="control-label accusation-explanation-label" htmlFor="accusation-explanation">03 · EXPLAIN YOUR THEORY
-              <textarea id="accusation-explanation" maxLength={2000} onChange={(event) => setExplanation(event.target.value)} placeholder="Why this suspect? Which discovered clues matter? How does the reported timeline fit, and what motive do you think the evidence supports?" required rows={5} value={explanation} />
+              <textarea id="accusation-explanation" maxLength={2000} onChange={(event) => setExplanation(event.target.value)} placeholder="Why this suspect? Which discovered clues matter? How does the reported timeline fit, and what motive do you think the clues support?" required rows={5} value={explanation} />
               <span className="field-hint">1–2000 characters. This is your written theory; the game does not use natural-language AI to judge it. {explanation.length}/2000</span>
             </label>
             {formError && <p aria-live="assertive" className="accusation-error">{formError}</p>}
@@ -392,7 +392,7 @@ function FinalAccusation({ caseFile, discoveredEvidenceIds, progress, onComplete
           <h3 id="accusation-review-title" tabIndex={-1} ref={headingRef}>Confirm your accusation</h3>
           <div className="accusation-review-grid">
             <div><span className="detail-label">Selected suspect</span><strong>{selectedSuspect?.name || 'No suspect selected'}</strong><span>{selectedSuspect?.role}</span></div>
-            <div><span className="detail-label">Discovered evidence cited</span>{selectedEvidence.length ? <ul>{selectedEvidence.map((item) => <li key={item.id}>{item.id} · {item.title}</li>)}</ul> : <p>No evidence selected. The evaluation may be insufficient.</p>}</div>
+            <div><span className="detail-label">Discovered clues cited</span>{selectedEvidence.length ? <ul>{selectedEvidence.map((item) => <li key={item.id}>{item.id} · {item.title}</li>)}</ul> : <p>No clue selected. The evaluation may be insufficient.</p>}</div>
             <div className="accusation-review-theory"><span className="detail-label">Your explanation</span><p>{explanation.trim()}</p></div>
           </div>
           <p className="resolution-caveat">Confirming reveals the configured fictional case reconstruction. You can return to revise this review without losing your discovery progress.</p>

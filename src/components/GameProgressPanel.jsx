@@ -130,7 +130,7 @@ function GameProgressPanel({ caseFile, progress, saveStatus, hasUnsavedJournalDr
         <span><strong>Last saved</strong>{formatTimestamp(saveStatus.lastSavedAt || progress.savedAt)}</span>
         <span><strong>Journal entries</strong>{progress.journalEntries.length}</span>
         <span><strong>Bookmarks</strong>{bookmarkCount}</span>
-        <span><strong>Case record</strong>{progress.completion ? 'Completed accusation' : 'In progress'}</span>
+        <span><strong>Case status</strong>{progress.completion ? 'Completed accusation' : 'In progress'}</span>
       </div>
       {saveStatus.errors?.length > 0 && (
         <ul className="save-message-list is-error" aria-label="Save issues">
@@ -161,7 +161,7 @@ function GameProgressPanel({ caseFile, progress, saveStatus, hasUnsavedJournalDr
         />
       </div>
       {saveStatus.recoveryRequired && <p className="save-recovery-note">To protect the stored file, saving is paused. Import a valid save or confirm a case-progress reset to recover.</p>}
-      <p className="section-intro">Saves contain player discoveries, journal notes, bookmark IDs and a confirmed accusation. Static case records and algorithm indexes are rebuilt from the application data.</p>
+      <p className="section-intro">Saves contain player discoveries, journal notes, bookmark IDs and a confirmed accusation. Static case data and algorithm indexes are rebuilt from the application data.</p>
     </section>
   )
 }

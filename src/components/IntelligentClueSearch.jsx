@@ -33,7 +33,7 @@ function IntelligentClueSearch({ clueSearchIndex, discoveredEvidenceIds, onSelec
     setQuery(word)
     setActiveSuggestion(-1)
     setSuggestionsDismissed(true)
-    setStatusMessage(`Showing records associated with “${word}”.`)
+    setStatusMessage(`Showing case entries associated with “${word}”.`)
   }
 
   const chooseResult = (result) => {
@@ -123,7 +123,7 @@ function IntelligentClueSearch({ clueSearchIndex, discoveredEvidenceIds, onSelec
               role="option"
             >
               <span><HighlightedSuggestion prefix={prefix} word={suggestion.word} /></span>
-              <small>{suggestion.records.length} linked record{suggestion.records.length === 1 ? '' : 's'}</small>
+              <small>{suggestion.records.length} linked entr{suggestion.records.length === 1 ? 'y' : 'ies'}</small>
             </li>
           ))}
         </ul>
@@ -131,12 +131,12 @@ function IntelligentClueSearch({ clueSearchIndex, discoveredEvidenceIds, onSelec
 
       <div aria-live="polite" className="intelligent-search-status">
         {statusMessage || (prefix
-          ? `${results.length} matching record${results.length === 1 ? '' : 's'} shown for words beginning “${prefix}”.`
-          : 'Type at least one letter to see word suggestions and matching records.')}
+          ? `${results.length} matching case entr${results.length === 1 ? 'y' : 'ies'} shown for words beginning “${prefix}”.`
+          : 'Type at least one letter to see word suggestions and matching case entries.')}
       </div>
 
       {prefix && results.length > 0 && (
-        <ul aria-label="Matching case records" className="clue-search-results">
+        <ul aria-label="Matching case entries" className="clue-search-results">
           {results.map((result) => {
             const isSealed = result.type === 'evidence' && !discoveredEvidenceIds.has(result.id)
             return (
@@ -145,7 +145,7 @@ function IntelligentClueSearch({ clueSearchIndex, discoveredEvidenceIds, onSelec
                   <span className="clue-result-meta"><span>{getTypeLabel(result.type)}</span><code>{result.id}</code></span>
                   <strong>{result.title}</strong>
                   <span className="clue-result-matches">Matched: {result.matchingWords.slice(0, 3).join(', ')}</span>
-                  {isSealed && <small className="clue-result-sealed">Sealed · search does not discover evidence</small>}
+                  {isSealed && <small className="clue-result-sealed">Sealed · search does not uncover clues</small>}
                 </button>
               </li>
             )
@@ -153,7 +153,7 @@ function IntelligentClueSearch({ clueSearchIndex, discoveredEvidenceIds, onSelec
         </ul>
       )}
 
-      {prefix && results.length === 0 && <p className="intelligent-search-empty">No case records contain a word beginning with “{prefix}”. Try another prefix.</p>}
+      {prefix && results.length === 0 && <p className="intelligent-search-empty">No case entry contains a word beginning with “{prefix}”. Try another prefix.</p>}
     </section>
   )
 }

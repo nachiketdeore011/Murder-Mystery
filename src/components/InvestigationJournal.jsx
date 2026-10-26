@@ -13,7 +13,7 @@ const CATEGORY_LABELS = Object.freeze({
   observation: 'Observation',
   suspect_theory: 'Suspect theory',
   timeline_note: 'Timeline note',
-  evidence_connection: 'Evidence connection',
+  evidence_connection: 'Clue connection',
   unresolved_question: 'Unresolved question',
 })
 
@@ -133,7 +133,7 @@ function InvestigationJournal({
           discoveredEvidenceIds,
         })
         onEntriesChange([...entries, entry])
-        setFeedback('Journal entry saved. This is a player note, not verified evidence.')
+        setFeedback('Journal entry saved. This is a player note, not verified case data.')
       }
       setIsFormOpen(false)
       setEditingId(null)
@@ -162,15 +162,15 @@ function InvestigationJournal({
         ? removeBookmark(bookmarks, type, id)
         : addBookmark(bookmarks, type, id, { caseFile, discoveredEvidenceIds })
       onBookmarksChange(next)
-      setFeedback(list.includes(id) ? 'Bookmark removed.' : 'Record bookmarked.')
+      setFeedback(list.includes(id) ? 'Bookmark removed.' : 'Bookmark saved.')
     } catch (error) {
-      setFeedback(error instanceof Error ? error.message : 'The record could not be bookmarked.')
+      setFeedback(error instanceof Error ? error.message : 'This entry could not be bookmarked.')
     }
   }
 
   const bookmarkGroups = [
     { type: 'suspects', label: 'Suspects', records: caseFile.suspects },
-    { type: 'evidence', label: 'Discovered evidence', records: discoveredEvidence },
+    { type: 'evidence', label: 'Discovered clues', records: discoveredEvidence },
     { type: 'locations', label: 'Locations', records: caseFile.locations },
   ]
 
@@ -235,7 +235,7 @@ function InvestigationJournal({
                     </option>
                   ))}
                 </select>
-                <span className="field-hint">Only discovered evidence can be linked.</span>
+                <span className="field-hint">Only discovered clues can be linked.</span>
               </label>
               <label className="control-label" htmlFor="journal-body-input">Note
                 <textarea
@@ -304,7 +304,7 @@ function InvestigationJournal({
 
         <aside aria-labelledby="bookmarks-title" className="bookmark-panel">
           <div className="bookmark-panel-heading">
-            <span className="section-kicker">SAVED RECORDS</span>
+            <span className="section-kicker">SAVED ENTRIES</span>
             <h3 id="bookmarks-title">Bookmarks</h3>
           </div>
           {bookmarkGroups.map((group) => {
@@ -328,7 +328,7 @@ function InvestigationJournal({
             )
           })}
           {bookmarkCount(bookmarks) === 0 && <p className="bookmark-empty">No bookmarks yet. Save a suspect, discovered clue or location for quick reference.</p>}
-          <p className="bookmark-privacy-note">Bookmarks store record IDs only. Sealed evidence cannot be bookmarked or opened from here.</p>
+          <p className="bookmark-privacy-note">Bookmarks store entry IDs only. Sealed clues cannot be bookmarked or opened from here.</p>
         </aside>
       </div>
     </section>

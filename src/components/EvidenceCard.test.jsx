@@ -32,6 +32,15 @@ describe('evidence card', () => {
     expect(markup).toContain('Inspect clue')
   })
 
+  it('labels the sealed card with the player-facing clue vocabulary', () => {
+    const markup = renderCard()
+
+    expect(markup).toContain('Sealed clue')
+    expect(markup).toContain('>Sealed<')
+    expect(markup).not.toContain('Evidence awaiting inspection')
+    expect(markup).not.toContain('Undiscovered')
+  })
+
   it('names the room in the accessible label of the inspect action', () => {
     expect(renderCard()).toContain('aria-label="Inspect the clue filed in the Main Hall"')
   })

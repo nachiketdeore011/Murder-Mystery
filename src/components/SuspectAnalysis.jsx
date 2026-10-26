@@ -136,7 +136,7 @@ function SuspectAnalysis({ caseFile, caseIndex, discoveredEvidenceIds, onSelectE
           <label>Second profile<select aria-label="Second profile to compare" onChange={(event) => setComparisonRightId(event.target.value)} value={comparisonRightId}>{suspects.map(({ id, name }) => <option key={id} value={id}>{name}</option>)}</select></label>
         </div>
         {comparisonLeft && comparisonRight && comparisonLeft.id === comparisonRight.id
-          ? <p className="suspect-analysis-notice" role="status">Choose two different profiles to compare their discovered records.</p>
+          ? <p className="suspect-analysis-notice" role="status">Choose two different profiles to compare their discovered clues.</p>
           : comparisonLeft && comparisonRight && (
             <div className="suspect-comparison-results">
               {[comparisonLeft, comparisonRight].map((suspect) => (
@@ -159,7 +159,7 @@ function SuspectAnalysis({ caseFile, caseIndex, discoveredEvidenceIds, onSelectE
       <details className="suspect-ranking-explainer">
         <summary>How this ranking works</summary>
         <div className="ranking-explainer-copy">
-          <p>The engine starts with the existing suspect records and considers discovered evidence only. Current case links in <code>relatedSuspectIds</code> become explicit follow-up leads under this fictional rule: each adds {SUSPECT_RANKING_CONFIG.points.supporting} point. Contradicting relationships, when explicitly configured, subtract {SUSPECT_RANKING_CONFIG.points.contradicting} point; neutral relationships add zero. Duplicate suspect/clue links count once.</p>
+          <p>The engine starts with the existing suspect records and considers discovered clues only. Current case links in <code>relatedSuspectIds</code> become explicit follow-up leads under this fictional rule: each adds {SUSPECT_RANKING_CONFIG.points.supporting} point. Contradicting relationships, when explicitly configured, subtract {SUSPECT_RANKING_CONFIG.points.contradicting} point; neutral relationships add zero. Duplicate suspect/clue links count once.</p>
           <p>A priority label requires at least {SUSPECT_RANKING_CONFIG.minimumDirectionalClues} discovered directionally classified clues. Once that threshold is met, High begins at {SUSPECT_RANKING_CONFIG.priorityThresholds.high} points, Moderate at {SUSPECT_RANKING_CONFIG.priorityThresholds.moderate}, and lower totals are labeled Low. Insufficient evidence takes precedence. This case currently has no substantiated contradictory links. The score represents investigation priority, never a statistical probability or finding of guilt. Reported timeline events add context only; the physical corridor graph is not a suspect relationship graph.</p>
           <p>With ID indexes, relationship processing is O(S + E + R + T + A), plus O(S log S) to order suspects. Here S is suspects, E evidence records, R relationship records, T timeline events and A suspect/event associations. No DSA structure is forced into the score calculation beyond the existing ID lookup index.</p>
           <p>Equal weights are used because the current case does not define calibrated evidence-strength points; reliability labels are shown elsewhere and are not treated as numeric probabilities.</p>

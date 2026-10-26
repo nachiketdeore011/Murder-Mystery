@@ -60,7 +60,7 @@ function RecordActions({ isBookmarked, onAddNote, onToggleBookmark, recordLabel 
   return (
     <div className="record-detail-actions">
       <button className="button button-secondary" onClick={onToggleBookmark} type="button">
-        {isBookmarked ? 'Remove bookmark' : 'Bookmark record'}
+        {isBookmarked ? 'Remove bookmark' : 'Bookmark this clue'}
       </button>
       <button className="button button-secondary" onClick={onAddNote} type="button">Add journal note about this {recordLabel}</button>
     </div>
@@ -200,7 +200,7 @@ function Investigation({
     if (result.type === 'evidence') {
       if (discoveredEvidenceIds.has(result.id)) {
         selectDetail('evidence', result.id)
-        return `Opened discovered evidence ${result.id}.`
+        return `Opened discovered clue ${result.id}.`
       }
       const sealedEvidence = caseIndex.getEvidenceById(result.id)
       const sealedLocationName = sealedEvidence ? caseIndex.getLocationById(sealedEvidence.discoveredAt)?.name : null
@@ -211,7 +211,7 @@ function Investigation({
     }
     if (result.type === 'suspect' || result.type === 'location') {
       selectDetail(result.type, result.id)
-      return `Opened the ${result.type} record for ${result.title}.`
+      return `Opened the ${result.type === 'suspect' ? 'suspect profile' : 'location'} entry for ${result.title}.`
     }
     if (result.type === 'timeline') {
       selectTimelineEvent(result.id)
@@ -252,7 +252,7 @@ function Investigation({
 
       <nav aria-label="Map and relationship tools" className="investigation-map-nav">
         <a href="#crime-scene-map">Crime Scene Map</a>
-        <a href="#evidence-relationship-network">Evidence Network</a>
+        <a href="#evidence-relationship-network">Clue Network</a>
       </nav>
 
       <section aria-label="Case overview" className="case-overview">
@@ -267,8 +267,8 @@ function Investigation({
             <span className="section-kicker">CASE PROGRESS</span>
             <span className={`status-pill${discoveredCount ? ' is-active' : ''}`}>{currentStatus}</span>
           </div>
-          <div className="progress-numbers"><strong>{discoveredCount}<span> / {evidenceTotal}</span></strong><span>evidence records discovered</span></div>
-          <ProgressBar label={`${progressPercent}% of evidence collected`} value={progressPercent} />
+          <div className="progress-numbers"><strong>{discoveredCount}<span> / {evidenceTotal}</span></strong><span>clues discovered</span></div>
+          <ProgressBar label={`${progressPercent}% of clues collected`} value={progressPercent} />
           <div className="progress-caption"><span>{progressPercent}% collected</span><span>Case {caseFile.id}</span></div>
           <p className="progress-next-step"><strong>Next step</strong>{nextStepHint({ activityLog, caseFile, discoveredEvidenceIds, progress })}</p>
         </div>
@@ -326,16 +326,16 @@ function Investigation({
               <div><span className="detail-label">Role / age</span><p>{selectedSuspect.role}, {selectedSuspect.age}</p></div>
               <div><span className="detail-label">Possible motive</span><p>{selectedSuspect.motive}</p></div>
               <div><span className="detail-label">Stated alibi</span><p>{selectedSuspect.alibi}</p></div>
-              <div><span className="detail-label">Associated records</span>
+              <div><span className="detail-label">Associated clues</span>
                 {selectedSuspect.evidenceIds.length ? (
                   <ul className="detail-reference-list">
                     {selectedSuspect.evidenceIds.map((id) => {
                       const evidence = caseIndex.getEvidenceById(id)
                       const isDiscovered = discoveredEvidenceIds.has(id)
-                      return <li key={id}><span>{id}</span>{isDiscovered ? evidence.title : 'Locked record'}</li>
+                      return <li key={id}><span>{id}</span>{isDiscovered ? evidence.title : 'Sealed clue'}</li>
                     })}
                   </ul>
-                ) : <p>No records are currently associated with this profile.</p>}
+                ) : <p>No clues are currently associated with this profile.</p>}
               </div>
             </div>
             <p className="detail-caution">These are reported accounts and possible motives; none establishes guilt.</p>
@@ -343,7 +343,7 @@ function Investigation({
               isBookmarked={isBookmarked('suspects', selectedSuspect.id)}
               onAddNote={() => requestJournalEntry('suspect', selectedSuspect.id)}
               onToggleBookmark={() => toggleBookmark('suspect', selectedSuspect.id)}
-              recordLabel="suspect"
+              recordLabel="suspect profile"
             />
           </DetailPanel>
         )}
@@ -377,16 +377,16 @@ function Investigation({
       <section aria-labelledby="evidence-title" className="investigation-section evidence-section">
         <div className="section-heading-row">
           <div>
-            <span className="section-kicker">CLUE REGISTER</span>
-            <h2 id="evidence-title">Evidence</h2>
+            <span className="section-kicker">SEALED AND DISCOVERED</span>
+            <h2 id="evidence-title">Clue Register</h2>
             <span className="algorithm-tag">Hash table index · O(1) lookup</span>
           </div>
           <span className="section-count">{discoveredCount} of {evidenceTotal} discovered</span>
         </div>
         <p className="section-intro">Sealed clues unlock when you inspect their card here. Every sealed card names the room it was filed in, and the Crime Scene Map shows the rooms you have already uncovered.</p>
         <div className="evidence-controls">
-          <label className="control-label">Search discovered evidence
-            <input aria-label="Search evidence" onChange={(event) => setSearchTerm(event.target.value)} placeholder="Search titles and descriptions" type="search" value={searchTerm} />
+          <label className="control-label">Search discovered clues
+            <input aria-label="Search clues" onChange={(event) => setSearchTerm(event.target.value)} placeholder="Search titles and descriptions" type="search" value={searchTerm} />
           </label>
           <label className="control-label">Category
             <select aria-label="Filter by category" onChange={(event) => setSelectedCategory(event.target.value)} value={selectedCategory}>
@@ -397,8 +397,8 @@ function Investigation({
         </div>
         <div aria-live="polite" className="evidence-results-note">
           {searchTerm.trim() || selectedCategory !== 'all'
-            ? `${visibleEvidence.length} matching discovered record${visibleEvidence.length === 1 ? '' : 's'}; sealed records remain hidden.`
-            : `${visibleEvidence.length} records in this file, including sealed clues.`}
+            ? `${visibleEvidence.length} matching discovered clue${visibleEvidence.length === 1 ? '' : 's'}; sealed clues remain hidden.`
+            : `${visibleEvidence.length} clues in this file, including sealed ones.`}
         </div>
         {visibleEvidence.length ? (
           <div className="evidence-grid">
@@ -416,28 +416,28 @@ function Investigation({
               )
             })}
           </div>
-        ) : <p className="empty-results">No discovered records match those filters.</p>}
+        ) : <p className="empty-results">No discovered clues match those filters.</p>}
         {selectedEvidence && discoveredEvidenceIds.has(selectedEvidence.id) && (
-          <DetailPanel id="evidence-detail-panel" eyebrow={`EVIDENCE RECORD · ${selectedEvidence.id}`} onClose={closeDetail} title={selectedEvidence.title}>
+          <DetailPanel id="evidence-detail-panel" eyebrow={`CLUE FILE · ${selectedEvidence.id}`} onClose={closeDetail} title={selectedEvidence.title}>
             <div className="evidence-detail-grid">
               <div><span className="detail-label">Category</span><p>{selectedEvidence.category}</p></div>
               <div><span className="detail-label">Reliability</span><p className={`reliability-label is-${selectedEvidence.reliability}`}>{selectedEvidence.reliability}</p></div>
               <div><span className="detail-label">Found at</span><p>{caseIndex.getLocationById(selectedEvidence.discoveredAt)?.name}</p></div>
               <div><span className="detail-label">Recorded time</span><p>{selectedEvidence.timestamp || 'Not recorded'}</p></div>
-              <div className="detail-wide"><span className="detail-label">Record</span><p>{selectedEvidence.description}</p></div>
+              <div className="detail-wide"><span className="detail-label">Details</span><p>{selectedEvidence.description}</p></div>
               <div className="detail-wide"><span className="detail-label">Why it may matter</span><p>{selectedEvidence.relevance}</p></div>
               <div className="detail-wide"><span className="detail-label">Related profiles</span>
                 {selectedEvidence.relatedSuspectIds.length
                   ? <p>{selectedEvidence.relatedSuspectIds.map((id) => caseIndex.getSuspectById(id)?.name).filter(Boolean).join(', ')}</p>
-                  : <p>No suspect is currently linked to this record.</p>}
+                  : <p>No suspect is currently linked to this clue.</p>}
               </div>
             </div>
-            <p className="detail-caution">A recorded association or relevance does not establish responsibility.</p>
+            <p className="detail-caution">A documented association or relevance does not establish responsibility.</p>
             <RecordActions
               isBookmarked={isBookmarked('evidence', selectedEvidence.id)}
               onAddNote={() => requestJournalEntry('evidence', selectedEvidence.id)}
               onToggleBookmark={() => toggleBookmark('evidence', selectedEvidence.id)}
-              recordLabel="discovered evidence"
+              recordLabel="clue"
             />
           </DetailPanel>
         )}
@@ -472,7 +472,7 @@ function Investigation({
         {selectedLocation && (
           <DetailPanel id="location-detail-panel" eyebrow={`LOCATION RECORD · ${selectedLocation.id}`} onClose={closeDetail} title={selectedLocation.name}>
             <p className="location-description">{selectedLocation.description}</p>
-            <p className="location-record-count">{selectedLocation.evidenceIds.length} evidence records associated · {selectedLocation.evidenceIds.filter((id) => discoveredEvidenceIds.has(id)).length} inspected</p>
+            <p className="location-record-count">{selectedLocation.evidenceIds.length} clues filed here · {selectedLocation.evidenceIds.filter((id) => discoveredEvidenceIds.has(id)).length} inspected</p>
             <div className="location-detail-columns">
               <div><span className="detail-label">Connected locations</span>
                 <p>{selectedLocation.connectedLocationIds.map((id) => caseIndex.getLocationById(id)?.name).filter(Boolean).join(' · ')}</p>

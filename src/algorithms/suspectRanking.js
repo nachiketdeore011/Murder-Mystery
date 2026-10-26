@@ -194,7 +194,7 @@ export function rankSuspects({
     const affectingClues = [...supportingEvidence, ...contradictingEvidence]
     const directionalSummary = `${directionalEvidenceCount} discovered directionally classified clue${directionalEvidenceCount === 1 ? '' : 's'} ${directionalEvidenceCount === 1 ? 'affects' : 'affect'} this profile`
     const clueSummary = affectingClues.length
-      ? ` Discovered records affecting this score: ${affectingClues.map((item) => `${item.id} (${item.title})`).join('; ')}.`
+      ? ` Discovered clues affecting this score: ${affectingClues.map((item) => `${item.id} (${item.title})`).join('; ')}.`
       : ''
     const explanation = directionalEvidenceCount < config.minimumDirectionalClues
       ? `Investigation score: ${formatSigned(score)}. ${directionalSummary}; at least ${config.minimumDirectionalClues} are required for a meaningful priority label. This score is not a probability of guilt.${clueSummary}`
@@ -202,7 +202,7 @@ export function rankSuspects({
 
     const unresolvedQuestions = [
       'What independent information could corroborate or challenge the reported account?',
-      'Which additional discovered records, if any, can establish a reliable time or location?',
+      'Which additional discovered clues, if any, can establish a reliable time or location?',
     ]
     const relevantTimelineEvents = (eventIdsBySuspect.get(suspectId) || [])
       .map((id) => getTimelineEvent(id))

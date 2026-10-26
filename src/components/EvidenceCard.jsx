@@ -17,12 +17,12 @@ function EvidenceCard({ evidence, isDiscovered, locationName, onDiscover, onInsp
       ) : (
         <>
           <span aria-hidden="true" className="lock-mark">—</span>
-          <h3>Evidence awaiting inspection</h3>
+          <h3>Sealed clue</h3>
           <p className="locked-copy">
             Sealed until you inspect it. {locationName ? `Filed in the ${locationName}.` : 'Filed in an unlisted room.'}
           </p>
           <div className="evidence-card-footer">
-            <span className="locked-label">Undiscovered</span>
+            <span className="locked-label">Sealed</span>
             <button aria-label={`Inspect the clue filed in the ${locationName || 'unlisted room'}`} className="inline-action" onClick={onDiscover} type="button">Inspect clue</button>
           </div>
         </>

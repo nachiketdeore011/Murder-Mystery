@@ -116,10 +116,10 @@ function EvidenceRelationshipNetwork({
       <div className="section-heading-row">
         <div>
           <span className="section-kicker">DOCUMENTED CASE LINKS</span>
-          <h2 id="evidence-network-title">Evidence Relationship Network</h2>
+          <h2 id="evidence-network-title">Clue Relationship Network</h2>
           <span className="algorithm-tag">Graph relationships</span>
         </div>
-        <span className="section-count">{visibleNodes.length} visible records · {visibleEdges.length} documented links</span>
+        <span className="section-count">{visibleNodes.length} visible entries · {visibleEdges.length} documented links</span>
       </div>
       <p className="section-intro">This network organizes recorded relationships, not mansion corridors. A link can guide follow-up, but it does not prove guilt or establish that a person was physically present.</p>
 
@@ -152,7 +152,7 @@ function EvidenceRelationshipNetwork({
               style={{ minHeight: `${layout.height}px` }}
             >
               <title id="evidence-network-svg-title">Documented case relationship network</title>
-              <desc id="evidence-network-svg-description">Select a node to inspect a suspect, location, discovered evidence record, or timeline report. Evidence records appear only after discovery.</desc>
+              <desc id="evidence-network-svg-description">Select a node to inspect a suspect, location, discovered clue, or timeline report. Clues appear only after discovery.</desc>
               {NODE_TYPES.map(({ id, label }) => (
                 <text className="evidence-network-column-label" key={id} textAnchor="middle" x={COLUMN_X[id]} y="22">{label}</text>
               ))}
@@ -185,7 +185,7 @@ function EvidenceRelationshipNetwork({
                 const labelLines = wrapNodeLabel(node.label)
                 return (
                   <g
-                    aria-label={`${node.type}: ${node.label} (${node.recordId})${node.type === 'evidence' ? ', discovered evidence' : ''}`}
+                    aria-label={`${node.type}: ${node.label} (${node.recordId})${node.type === 'evidence' ? ', discovered clue' : ''}`}
                     aria-pressed={selected}
                     className={`evidence-network-node is-${node.type}${selected ? ' is-selected' : ''}${connected ? ' is-connected' : ''}${dim ? ' is-dim' : ''}`}
                     key={node.id}
@@ -251,7 +251,7 @@ function EvidenceRelationshipNetwork({
                 <>
                   <p>{selectedRecord.description}</p>
                   {selectedRecord.relevance && <p className="network-detail-note"><strong>Investigator note:</strong> {selectedRecord.relevance}</p>}
-                  <p className="network-detail-note">This record is discovered. Its association with a profile is a lead for follow-up, not proof of responsibility.</p>
+                  <p className="network-detail-note">This clue is discovered. Its association with a profile is a lead for follow-up, not proof of responsibility.</p>
                 </>
               )}
               {selectedNode.type === 'timeline' && selectedRecord && (

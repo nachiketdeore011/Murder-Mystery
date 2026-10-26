@@ -7,7 +7,7 @@ const STATUS_LABELS = {
   supported: 'Supported for further investigation',
   contradicted: 'A documented conflict needs review',
   inconclusive: 'Inconclusive',
-  insufficient_evidence: 'Insufficient discovered evidence',
+  insufficient_evidence: 'Insufficient discovered clues',
 }
 
 function EvidenceFactList({ facts, emptyMessage, onSelectEvidence }) {
@@ -20,8 +20,8 @@ function EvidenceFactList({ facts, emptyMessage, onSelectEvidence }) {
           <strong>{fact.title}</strong>
           <p>{fact.explanation}</p>
           {fact.rationale && fact.rationale !== fact.explanation && <small>{fact.rationale}</small>}
-          {fact.evidenceId && <button className="deduction-evidence-link" onClick={() => onSelectEvidence(fact.evidenceId)} type="button">Inspect discovered record · {fact.evidenceId}</button>}
-          {fact.evidenceIds?.map((evidenceId) => <button className="deduction-evidence-link" key={evidenceId} onClick={() => onSelectEvidence(evidenceId)} type="button">Inspect discovered record · {evidenceId}</button>)}
+          {fact.evidenceId && <button className="deduction-evidence-link" onClick={() => onSelectEvidence(fact.evidenceId)} type="button">Inspect discovered clue · {fact.evidenceId}</button>}
+          {fact.evidenceIds?.map((evidenceId) => <button className="deduction-evidence-link" key={evidenceId} onClick={() => onSelectEvidence(evidenceId)} type="button">Inspect discovered clue · {evidenceId}</button>)}
         </li>
       ))}
     </ul>
@@ -218,7 +218,7 @@ function DeductionLab({ caseFile, caseIndex, discoveredEvidenceIds, onSelectEvid
         <div><span className="section-kicker">FACTS, CONSTRAINTS, UNCERTAINTY</span><h2 id="deduction-lab-title">Deduction Lab</h2></div>
         <span className="section-count">No guilt verdicts</span>
       </div>
-      <p className="section-intro">Evaluate the theory that a profile merits further investigation. The engine considers discovered clues and explicitly documented constraints; a contradiction flags records for review and does not prove guilt.</p>
+      <p className="section-intro">Evaluate the theory that a profile merits further investigation. The engine considers discovered clues and explicitly documented constraints; a contradiction flags clues for review and does not prove guilt.</p>
 
       <div className="deduction-controls">
         <label className="deduction-field">Theory to evaluate
@@ -246,7 +246,7 @@ function DeductionLab({ caseFile, caseIndex, discoveredEvidenceIds, onSelectEvid
             <p>{result.explanation}</p>
           </div>
 
-          {result.status === 'insufficient_evidence' && <p className="deduction-notice" role="status">Not enough discovered evidence to evaluate this theory. Continue investigating and return when you have more information.</p>}
+          {result.status === 'insufficient_evidence' && <p className="deduction-notice" role="status">Not enough discovered clues to evaluate this theory. Continue investigating and return when you have more information.</p>}
 
           <div className="deduction-result-grid">
             <section className="deduction-result-card" aria-labelledby="deduction-support-title"><h4 id="deduction-support-title">Supporting facts</h4><EvidenceFactList facts={result.supportingFacts} emptyMessage="No discovered clue explicitly supports further investigation of this profile yet." onSelectEvidence={onSelectEvidence} /></section>
@@ -257,7 +257,7 @@ function DeductionLab({ caseFile, caseIndex, discoveredEvidenceIds, onSelectEvid
           </div>
 
           <section aria-labelledby="deduction-rules-title" className="deduction-rule-results"><h4 id="deduction-rules-title">Rules evaluated</h4>
-            <ul>{result.rulesEvaluated.map((rule) => <li className={`is-${rule.result}`} key={rule.ruleId}><div><strong>{rule.title}</strong><span className={`deduction-rule-status is-${rule.result}`}>{rule.result}</span></div><p>{rule.explanation}</p>{rule.referencedEvidenceIds.map((id) => <button className="deduction-evidence-link" key={id} onClick={() => onSelectEvidence(id)} type="button">Inspect discovered record · {id}</button>)}{rule.timelineEventIds.map((id) => <button className="deduction-evidence-link" key={id} onClick={() => onSelectTimelineEvent(id)} type="button">View reported timeline event · {id}</button>)}</li>)}</ul>
+            <ul>{result.rulesEvaluated.map((rule) => <li className={`is-${rule.result}`} key={rule.ruleId}><div><strong>{rule.title}</strong><span className={`deduction-rule-status is-${rule.result}`}>{rule.result}</span></div><p>{rule.explanation}</p>{rule.referencedEvidenceIds.map((id) => <button className="deduction-evidence-link" key={id} onClick={() => onSelectEvidence(id)} type="button">Inspect discovered clue · {id}</button>)}{rule.timelineEventIds.map((id) => <button className="deduction-evidence-link" key={id} onClick={() => onSelectTimelineEvent(id)} type="button">View reported timeline event · {id}</button>)}</li>)}</ul>
           </section>
 
           <section aria-labelledby="deduction-timeline-context-title" className="deduction-timeline-context"><h4 id="deduction-timeline-context-title">Relevant reported timeline context</h4>
@@ -286,8 +286,8 @@ function DeductionLab({ caseFile, caseIndex, discoveredEvidenceIds, onSelectEvid
       <details className="deduction-explainer">
         <summary>How rule-based deduction works</summary>
         <div>
-          <p>The engine frames a theory as “this profile merits further investigation.” It considers discovered evidence with an explicit relationship, then evaluates structured constraints. A supporting fact is a follow-up lead; a contradiction means documented records conflict and need review; an unresolved question identifies missing information. Missing information is never evidence of innocence.</p>
-          <p>The current case has explicit suspect/evidence links, but those links do not claim guilt or contradiction. The rule evaluator checks only verified, timestamped suspect-location observations that are explicitly present in records. No such observations currently exist. Reported timeline events are context and do not prove presence; the mansion corridor graph is not used for suspect movement or alibi inference.</p>
+          <p>The engine frames a theory as “this profile merits further investigation.” It considers discovered clues with a documented relationship, then evaluates structured constraints. A supporting fact is a follow-up lead; a contradiction means documented clues conflict and need review; an unresolved question identifies missing information. Missing information is never evidence of innocence.</p>
+          <p>The current case has explicit suspect/clue links, but those links do not claim guilt or contradiction. The rule evaluator checks only verified, timestamped suspect-location observations that are explicitly present in the case file. No such observations currently exist. Reported timeline events are context and do not prove presence; the mansion corridor graph is not used for suspect movement or alibi inference.</p>
           <p>Task 9 ranking measures follow-up priority, while this engine checks documented facts and constraints. A high priority can coexist with an inconclusive evaluation. Discovering a clue updates both views through the existing evidence state, and evaluating a theory never changes discovery progress.</p>
           <p>Each evaluation currently builds ID lookup indexes, scans the case evidence and timeline for relevant records, checks explicit relationships and evaluates configured rules: O(S + E + T + L + R), where S is suspects, E evidence, T timeline events, L locations and R relationships. The result uses linear storage in the records and findings; suspect comparison runs the same evaluation separately for each selected profile.</p>
         </div>
