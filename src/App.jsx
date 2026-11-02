@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { animate } from 'animejs'
 import Navbar from './components/Navbar.jsx'
 import ConfusionFeedbackModal from './components/ConfusionFeedbackModal.jsx'
 import GuidedTour from './components/GuidedTour.jsx'
 import HowToPlayModal from './components/HowToPlayModal.jsx'
+import CaseSimulation from './components/CaseSimulation.jsx'
 import About from './pages/About.jsx'
 import CaseFilesPlaceholder from './pages/CaseFilesPlaceholder.jsx'
 import Home from './pages/Home.jsx'
@@ -40,7 +42,9 @@ function App() {
   const [hasUnsavedJournalDraft, setHasUnsavedJournalDraft] = useState(false)
   const [activityLog, setActivityLog] = useState([])
   const [pendingSelection, setPendingSelection] = useState(null)
+  const [pendingSectionId, setPendingSectionId] = useState(null)
   const activitySequence = useRef(0)
+  const pageShellRef = useRef(null)
   const discoveredEvidenceIds = useMemo(() => new Set(progress.discoveredEvidenceIds), [progress.discoveredEvidenceIds])
 
   useEffect(() => {
@@ -168,6 +172,63 @@ function App() {
     return applySaveResult(saveGameProgress(progress, { caseFile: case001 }))
   }, [applySaveResult, progress, saveStatus.recoveryRequired])
 
+  useLayoutEffect(() => {
+    const pageShell = pageShellRef.current
+    const diagnosticsEnabled = import.meta.env.DEV
+    if (!pageShell) {
+      if (diagnosticsEnabled) console.warn('[Anime.js] Animation target missing')
+      return undefined
+    }
+
+    const prefersReducedMotion = typeof window.matchMedia === 'function'
+      && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (prefersReducedMotion) {
+      if (diagnosticsEnabled) console.info('[Anime.js] Reduced motion enabled; entrance animation skipped')
+      return undefined
+    }
+
+    if (diagnosticsEnabled) console.info('[Anime.js] Animation effect triggered; target found', pageShell)
+
+    let animation
+    let hasLoggedUpdate = false
+    let hasCompleted = false
+    try {
+      animation = animate(pageShell, {
+        opacity: [0, 1],
+        y: [60, 0],
+        scale: [0.96, 1],
+        duration: 1000,
+        ease: 'outCubic',
+        onBegin: () => {
+          if (diagnosticsEnabled) console.info('[Anime.js] Animation started')
+        },
+        onUpdate: () => {
+          if (!diagnosticsEnabled || hasLoggedUpdate) return
+          hasLoggedUpdate = true
+          const style = getComputedStyle(pageShell)
+          console.info('[Anime.js] Target styles updating', {
+            opacity: style.opacity,
+            transform: style.transform,
+          })
+        },
+        onComplete: () => {
+          hasCompleted = true
+          if (diagnosticsEnabled) console.info('[Anime.js] Animation completed')
+        },
+      })
+    } catch (error) {
+      pageShell.style.opacity = '1'
+      pageShell.style.transform = 'none'
+      console.error('[Anime.js] Animation failed; showing page without animation', error)
+      return undefined
+    }
+
+    return () => {
+      if (diagnosticsEnabled && !hasCompleted) console.info('[Anime.js] Animation cancelled during cleanup')
+      animation.revert()
+    }
+  }, [activeView])
+
   // Revision starts at zero, so loading a save never triggers an immediate write.
   // A malformed or incompatible save remains untouched until the player imports or resets.
   useEffect(() => {
@@ -253,6 +314,20 @@ function App() {
     updateProgress((current) => (current.tourCompleted ? current : { ...current, tourCompleted: true }))
   }, [progress.tourCompleted, updateProgress])
 
+  // The simulation can hand the player straight to the section it is describing.
+  // The scroll runs after the investigation view has painted its DOM.
+  useEffect(() => {
+    if (activeView !== 'investigation' || !pendingSectionId) return
+    const target = document.getElementById(pendingSectionId)
+    setPendingSectionId(null)
+    target?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [activeView, pendingSectionId])
+
+  const openInvestigationSection = useCallback((sectionId) => {
+    setPendingSectionId(typeof sectionId === 'string' && sectionId ? sectionId : null)
+    navigate('investigation')
+  }, [navigate])
+
   const openInvestigationRecord = useCallback((type, id) => {
     if (type === 'evidence' && !discoveredEvidenceIds.has(id)) return
     setPendingSelection({ type, id })
@@ -302,6 +377,15 @@ function App() {
         />
       )
       break
+    case 'simulation':
+      page = (
+        <CaseSimulation
+          caseFile={case001}
+          onOpenInvestigation={openInvestigationSection}
+          onReturnHome={() => navigate('home')}
+        />
+      )
+      break
     case 'case-files':
       page = (
         <CaseFilesPlaceholder
@@ -320,6 +404,7 @@ function App() {
         <Home
           onStartInvestigation={() => navigate('investigation')}
           onOpenHowToPlay={() => setIsHowToPlayOpen(true)}
+          onOpenSimulation={() => navigate('simulation')}
         />
       )
   }
@@ -327,7 +412,7 @@ function App() {
   return (
     <div className="app-shell">
       <Navbar activeView={activeView} onNavigate={navigate} />
-      <div className="page-shell" key={activeView}>
+      <div className="page-shell" key={activeView} ref={pageShellRef}>
         {page}
       </div>
       {activeView === 'investigation' && progress.tourCompleted === false && (

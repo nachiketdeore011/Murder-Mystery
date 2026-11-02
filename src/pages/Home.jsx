@@ -1,7 +1,7 @@
 import CaseBriefing from '../components/CaseBriefing.jsx'
 import MansionIllustration from '../components/MansionIllustration.jsx'
 
-function Home({ onStartInvestigation, onOpenHowToPlay }) {
+function Home({ onOpenHowToPlay, onOpenSimulation, onStartInvestigation }) {
   return (
     <main className="home-page">
       <section aria-labelledby="hero-title" className="hero-section">
@@ -27,6 +27,9 @@ function Home({ onStartInvestigation, onOpenHowToPlay }) {
             </button>
             <button className="button button-secondary" onClick={onOpenHowToPlay} type="button">
               How to Play
+            </button>
+            <button className="button button-secondary" onClick={onOpenSimulation} type="button">
+              Run the Simulation
             </button>
           </div>
           <p className="hero-file-note">

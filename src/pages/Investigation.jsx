@@ -3,6 +3,7 @@ import DetailPanel from '../components/DetailPanel.jsx'
 import EvidenceCard from '../components/EvidenceCard.jsx'
 import FinalAccusation from '../components/FinalAccusation.jsx'
 import BPlusTreeExplorer from '../components/BPlusTreeExplorer.jsx'
+import CounterfactualLab from '../components/CounterfactualLab.jsx'
 import DeductionLab from '../components/DeductionLab.jsx'
 import EvidenceRelationshipNetwork from '../components/EvidenceRelationshipNetwork.jsx'
 import GameProgressPanel from '../components/GameProgressPanel.jsx'
@@ -352,6 +353,12 @@ function Investigation({
       <SuspectAnalysis
         caseFile={caseFile}
         caseIndex={caseIndex}
+        discoveredEvidenceIds={discoveredEvidenceIds}
+        onSelectEvidence={(evidenceId) => selectDetail('evidence', evidenceId)}
+      />
+
+      <CounterfactualLab
+        caseFile={caseFile}
         discoveredEvidenceIds={discoveredEvidenceIds}
         onSelectEvidence={(evidenceId) => selectDetail('evidence', evidenceId)}
       />

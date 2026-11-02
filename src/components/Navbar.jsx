@@ -1,6 +1,7 @@
 const navItems = [
   { label: 'Home', view: 'home' },
   { label: 'Investigation', view: 'investigation' },
+  { label: 'Simulation', view: 'simulation' },
   { label: 'Analytics', view: 'analytics' },
   { label: 'Case Files', view: 'case-files' },
   { label: 'About', view: 'about' },
